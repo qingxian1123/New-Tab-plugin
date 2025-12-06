@@ -1,0 +1,583 @@
+/* 主题颜色变量  */
+/* :root 选择器用于在 HTML 文档的根元素上声明 CSS 变量。*/
+:root {
+    /* 浅色主题 (默认) */
+    /* 定义了一系列用于浅色主题的颜色和图像变量。*/
+    --bg-color: #e2e2e2; /* 背景颜色 */
+    --bg-image: url('https://source.unsplash.com/random/1920x1080?nature,light'); /* 背景图片 */
+    --text-color: #2c2c2c; /* 文本颜色 */
+    --text-color-muted: rgba(0, 0, 0, 0.5); /* 辅助文本颜色 (如占位符) */
+    --item-bg-color: rgba(255, 255, 255, 0.4); /* 元素背景颜色 (半透明) */
+    --item-bg-hover-color: rgba(255, 255, 255, 0.7); /* 元素鼠标悬停时背景颜色 */
+    --item-border-color: rgba(0, 0, 0, 0.2); /* 元素边框颜色 */
+    --icon-plate-bg-color: #f0f2f5; /* 图标底板背景颜色 */
+    --dialog-bg-color: rgba(250, 250, 250, 0.7); /* 对话框背景颜色 */
+    --shadow-color: rgba(0,0,0,0.1); /* 阴影颜色 */
+    --icon-name-text-color: #333; /* 图标名称文本颜色 */
+    --add-btn-color: #333; /* “添加”按钮颜色 */
+    --control-btn-color: #333; /* 控制按钮颜色 */
+    --control-btn-bg: rgba(255, 255, 255, 0.4); /* 控制按钮背景颜色 */
+    --hr-color: rgba(0, 0, 0, 0.1); /* 水平线颜色 */
+    --select-bg-color: rgba(255,255,255,.7); /* 下拉选择框背景颜色 */
+    --btn-secondary-bg: rgba(0,0,0,.05); /* 次要按钮背景颜色 */
+    --btn-secondary-hover-bg: rgba(0,0,0,.1); /* 次要按钮鼠标悬停时背景颜色 */
+    /* --- 优化：使用 currentColor 自动继承文本颜色 --- */
+    --search-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'%3E%3C/circle%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'%3E%3C/line%3E%3C/svg%3E"); /* 搜索图标 (SVG) */
+    --select-arrow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23333' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E"); /* 下拉箭头图标 (SVG) */
+    --icon-size: 64px; /* 图标容器尺寸，便于统一调整（用户要求：64px） */
+    --site-link-padding: 8px; /* site-link 内部留白 */
+}
+
+/* 💡 优化：当 html 元素具有 data-theme="dark" 属性时，应用深色主题。*/
+html[data-theme="dark"] {
+    /* 深色主题 */
+    /* 定义了一系列用于深色主题的颜色和图像变量，覆盖了 :root 中的默认值。*/
+    --bg-color: #2c2c2c;
+    --bg-image: url('https://source.unsplash.com/random/1920x1080?nature,dark,moody,blur');
+    --text-color: #eee;
+    --text-color-muted: rgba(255, 255, 255, 0.5);
+    --item-bg-color: rgba(44, 44, 44, 0.5);
+    --item-bg-hover-color: rgba(44, 44, 44, 0.7);
+    
+    /* 💡 优化：调低边框透明度，解决搜索框“白线”问题 */
+    --item-border-color: rgba(255, 255, 255, 0.15); /* 原来是 0.4 */
+    
+    --icon-plate-bg-color: #3a3a3c;
+    --dialog-bg-color: rgba(44, 44, 44, 0.7);
+    --shadow-color: rgba(0,0,0,0.2);
+    --icon-name-text-color: #eee;
+    --add-btn-color: rgba(255, 255, 255, 0.7);
+    --control-btn-color: #eee;
+    --control-btn-bg: rgba(44, 44, 44, 0.4);
+    --hr-color: rgba(255, 255, 255, 0.1);
+    --select-bg-color: rgba(80,80,80,.5);
+    --btn-secondary-bg: rgba(80,80,80,.5);
+    --btn-secondary-hover-bg: rgba(80,80,80,.8);
+    /* --- 优化：移除了多余的 --search-icon 定义 --- */
+    --select-arrow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23eee' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+}
+
+/* 💡 优化：新增 html 规则，用于消除闪烁 */
+html {
+    /* 将背景色设置在 <html> (根元素) 上，以在第一帧渲染正确背景色 */
+    background-color: var(--bg-color);
+    height: 100%; /* 确保 html 元素也占满全屏 */
+}
+
+/* --- 基础布局 --- */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; /* 设置字体，优先使用系统默认字体 */
+    /* 背景图片由 ::before 负责，这样我们可以对图片进行淡入淡出过渡 */
+    /* 💡 优化：background-color 已被移到 html 规则中 */
+    color: var(--text-color); /* 设置全局文本颜色 */
+    height: 100vh; /* body 高度占满整个视口 */
+    margin: 0; /* 移除默认的 body margin */
+    text-align: center; /* 文本居中对齐 */
+    overflow: hidden; /* 隐藏超出部分，防止出现滚动条 */
+    display: flex; /* 使用 flexbox 布局 */
+    flex-direction: column; /* 子元素垂直排列 */
+    justify-content: center; /* 子元素在主轴上居中 (垂直居中) */
+    align-items: center; /* 子元素在交叉轴上居中 (水平居中) */
+    transition: background-color 0.35s ease, color 0.35s ease; /* 为背景色和文本颜色添加平滑过渡效果 */
+    position: relative; /* 以便 ::before 作为背景层 */
+}
+
+/* 背景图片层：使用 CSS 变量 --bg-image 来控制 */
+body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -2;
+    background-image: var(--bg-image);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    transform-origin: center;
+    opacity: 1;
+    transition: opacity 360ms ease, transform 360ms ease;
+    will-change: opacity, transform;
+}
+
+/* 辅助类：在切换背景时短暂淡出再切回新图，以实现平滑过渡 */
+body.bg-fade::before {
+    opacity: 0;
+    transform: scale(1.02);
+}
+
+main {
+    max-width: 800px; /* 主内容区域最大宽度 */
+    padding: 20px; /* 内边距 */
+    transition: max-width 0.3s ease; /* 最大宽度变化时平滑过渡 */
+    display: flex; /* 使用 flexbox 布局 */
+    flex-direction: column; /* 子元素垂直排列 */
+    align-items: center; /* 子元素水平居中 */
+    width: 100%; /* 宽度占满父容器 */
+}
+
+/* --- 清理：移除了 #logo-container 和 #main-logo 样式 --- */
+
+/* 修改 .search-container：确保垂直排列并居中 */
+.search-container {
+    margin-bottom: 40px; /* 稍微减小底部间距 */
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+/* 新增：时间组件整体容器 */
+.time-widget {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 25px; /* 与搜索框的距离 */
+    text-shadow: 0 2px 10px var(--shadow-color); /* 统一的文字阴影 */
+    cursor: default;
+    user-select: none;
+}
+
+/* 修改：时钟样式 (字体改小，更显精致) */
+.clock {
+    font-size: 3.5rem; /* 原来是6rem，现在改小 */
+    font-weight: 300; /* 字重稍微加一点点，或者保持细体 */
+    color: var(--text-color);
+    line-height: 1.1;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    letter-spacing: -1px;
+}
+
+/* --- 搜索框 --- */
+#search-input {
+    width: 100%; /* 宽度占满父容器 */
+    max-width: 700px; /* 最大宽度 */
+    padding: 18px 30px 18px 65px; /* 内边距 (上 右 下 左)，左侧留出空间给图标 */
+    font-size: 1.4em; /* 字体大小 */
+    color: var(--text-color); /* 文本颜色 */
+    background-color: var(--item-bg-color); /* 背景颜色 */
+    backdrop-filter: blur(10px); /* 背景模糊效果 (毛玻璃) */
+    border: 1px solid var(--item-border-color); /* 边框 */
+    border-radius: 50px; /* 圆角，使其变为胶囊形状 */
+    outline: none; /* 移除默认的焦点轮廓 */
+    transition: all 0.2s ease; /* 所有属性变化时平滑过渡 */
+    box-shadow: 0 4px 20px var(--shadow-color); /* 添加阴影 */
+    background-image: var(--search-icon); /* 设置背景图标 (搜索图标) */
+    background-repeat: no-repeat; /* 背景图标不重复 */
+    background-position: left 25px center; /* 背景图标位置 */
+}
+
+#search-input:focus {
+    background-color: var(--item-bg-hover-color); /* 获得焦点时改变背景颜色 */
+    box-shadow: 0 4px 25px rgba(0,0,0,.15); /* 获得焦点时增强阴影 */
+}
+
+#search-input::placeholder {
+    color: var(--text-color-muted); /* 设置占位符文本颜色 */
+}
+
+/* --- 网站快捷方式 --- */
+.sites-container {
+    display: grid; /* 使用 grid 布局 */
+    grid-template-columns: repeat(var(--icons-per-row, 6), 1fr); /* 网格列数，由变量控制，默认为6列 */
+    gap: var(--icon-gap, 24px); /* 网格间距，由变量控制，默认为24px */
+    justify-items: center; /* 网格项在单元格内水平居中 */
+    margin-top: 40px; /* 与上方元素的间距 */
+    width: 100%; /* 宽度占满父容器 */
+}
+
+.site-item {
+    position: relative; /* 设置为相对定位，为删除按钮的绝对定位提供基准 */
+    display: flex; /* 使用 flexbox 布局 */
+    flex-direction: column; /* 子元素垂直排列 */
+    align-items: center; /* 子元素水平居中 */
+    text-decoration: none; /* 移除文本下划线 */
+}
+
+.site-link {
+    width: var(--icon-size); /* 宽度 */
+    height: var(--icon-size); /* 高度 */
+    border-radius: var(--icon-corner-radius, 32px); /* 圆角，由变量控制，默认为圆形 */
+    background-color: var(--icon-plate-bg-color); /* 背景颜色 */
+    backdrop-filter: none; /* 此处无背景模糊 */
+    border: none; /* 无边框 */
+    display: flex; /* 使用 flexbox 布局 */
+    justify-content: center; /* 子元素水平居中 */
+    align-items: center; /* 子元素垂直居中 */
+    padding: var(--site-link-padding); /* 内部留白，保证图标与边缘有空间 */
+    box-sizing: border-box; /* 使宽高包含 padding，保证外部尺寸一致 */
+    box-shadow: 0 4px 10px var(--shadow-color); /* 添加阴影 */
+    transition: all .2s ease; /* 所有属性变化时平滑过渡 */
+    cursor: pointer; /* 鼠标样式为手型 */
+}
+
+.site-link:hover {
+    transform: scale(1.1); /* 鼠标悬停时放大 */
+    box-shadow: 0 0 0 2px var(--item-border-color); /* 鼠标悬停时添加轮廓阴影 */
+}
+
+.site-icon {
+    /* 图标填充 site-link 的内容区域，保证内边距形成留白 */
+    width: 100%;
+    height: 100%;
+    border-radius: inherit; /* 与外层圆角一致 */
+    object-fit: contain; /* 图片等比缩放并完整显示在容器内 */
+    transition: filter .28s ease, transform .28s ease, opacity .28s ease;
+    display: block;
+    background-color: transparent;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.site-link {
+    transition: background-color .28s ease, box-shadow .28s ease, transform .28s ease;
+}
+
+/* 💡 优化：在深色主题下，增加一个非常轻的白色底板和内阴影，提升浅色图标与深色背景的对比 */
+html[data-theme="dark"] .site-link {
+    /* 💡 优化：将背景调亮一点，以柔和白色底图标的突兀感 */
+    background-color: rgba(255,255,255,0.1); /* 原来是 0.03 */
+    box-shadow: 0 6px 18px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.02) inset;
+}
+
+/* 💡 优化：深色主题下图标的增强效果：轻微提亮与阴影 */
+html[data-theme="dark"] .site-icon {
+    /* 💡 优化：移除提亮和饱和度，防止白色背景过曝 */
+    filter: drop-shadow(0 3px 6px rgba(0,0,0,0.6)); /* 原来有 saturate(1.05) brightness(1.05) */
+}
+
+/* 💡 优化：浅色主题下更柔和的阴影 */
+html[data-theme="light"] .site-icon {
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.12));
+}
+
+/* 给链接增加一个非常细的内边框/轮廓用于在复杂背景上分离图标 */
+/* 移除使用 ::after 作为内轮廓的实现（会在某些布局下造成覆盖问题），
+   改为直接用轻微的内阴影或边框在 .site-link 上实现视觉分离。 */
+/* 💡 优化：在深色下稍微加强内向阴影以分离图标 */
+html[data-theme="dark"] .site-link {
+    box-shadow: 0 6px 18px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.015) inset;
+}
+
+.site-name {
+    margin-top: 8px; /* 与上方图标的间距 */
+    font-size: 14px; /* 字体大小 */
+    color: var(--icon-name-text-color); /* 文本颜色 */
+    white-space: nowrap; /* 文本不换行 */
+    text-shadow: 0 1px 3px rgba(0,0,0,.5); /* 添加文本阴影，使其在复杂背景下更清晰 */
+}
+
+.add-site-btn {
+    width: var(--icon-size); /* 宽度 */
+    height: var(--icon-size); /* 高度 */
+    border-radius: var(--icon-corner-radius, 32px); /* 圆角 */
+    border-style: dashed; /* 虚线边框 */
+    border-width: 2px; /* 边框宽度 */
+    border-color: var(--item-border-color); /* 边框颜色 */
+    color: var(--add-btn-color); /* 内部 "+" 号颜色 */
+    font-size: calc(var(--icon-size) * 0.45); /* 字体大小 (控制 "+" 号大小) */
+    background-color: var(--item-bg-color); /* 背景颜色 */
+    backdrop-filter: blur(10px); /* 背景模糊 */
+    display: flex; /* 使用 flexbox 布局 */
+    justify-content: center; /* 水平居中 */
+    align-items: center; /* 垂直居中 */
+    cursor: pointer; /* 鼠标样式为手型 */
+    transition: all .2s ease; /* 平滑过渡 */
+}
+
+.add-site-btn:hover {
+    transform: scale(1.1); /* 鼠标悬停时放大 */
+    background-color: var(--item-bg-hover-color); /* 鼠标悬停时改变背景颜色 */
+}
+
+.delete-site-btn {
+    position: absolute; /* 绝对定位，相对于 .site-item */
+    top: -8px; /* 向上偏移 */
+    right: -8px; /* 向右偏移 */
+    width: 26px; /* 宽度 */
+    height: 26px; /* 高度 */
+    border-radius: 50%; /* 圆形 */
+    background-color: #ff4d4d; /* 背景颜色 (红色) */
+    color: #fff; /* 文本颜色 (白色) */
+    border: 2px solid var(--bg-color); /* 边框，颜色与页面背景相同，产生"镂空"效果 */
+    cursor: pointer; /* 鼠标样式为手型 */
+    font-size: 14px; /* 字体大小 */
+    line-height: 20px; /* 行高，用于垂直居中 "x" */
+    text-align: center; /* 文本水平居中 */
+    opacity: 0; /* 默认透明不可见 */
+    transform: scale(1); /* 默认大小 */
+    transition: opacity .2s ease,transform .2s ease; /* 为透明度和缩放添加平滑过渡 */
+    z-index: 10; /* 置于顶层 */
+    pointer-events: none; /* 默认情况下，按钮不可点击 */
+}
+
+
+/* --- UI 控制按钮 (右下角) --- */
+.ui-controls {
+    position: fixed; /* 固定定位，不随页面滚动 */
+    bottom: 40px; /* 距离底部 40px */
+    right: 40px; /* 距离右侧 40px */
+    display: flex; /* 使用 flexbox 布局 */
+    gap: 15px; /* 按钮之间的间距 */
+    z-index: 100; /* 置于顶层 */
+}
+
+.theme-btn,
+.settings-btn {
+    width: 50px; /* 宽度 */
+    height: 50px; /* 高度 */
+    border-radius: 50%; /* 圆形 */
+    border: 1px solid var(--item-border-color); /* 边框 */
+    background-color: var(--control-btn-bg); /* 背景颜色 */
+    backdrop-filter: blur(10px); /* 背景模糊 */
+    color: var(--control-btn-color); /* 图标颜色 */
+    font-size: 24px; /* 图标大小 */
+    cursor: pointer; /* 鼠标样式为手型 */
+    transition: all .2s ease; /* 平滑过渡 */
+    box-shadow: 0 2px 8px var(--shadow-color); /* 添加阴影 */
+    display: flex; /* 使用 flexbox 布局 */
+    justify-content: center; /* 水平居中 */
+    align-items: center; /* 垂直居中 */
+    padding: 0; /* 移除内边距 */
+}
+
+.theme-btn:hover,
+.settings-btn:hover {
+    transform: scale(1.1); /* 鼠标悬停时放大 */
+}
+
+.settings-btn:hover {
+    transform: scale(1.1) rotate(45deg); /* 设置按钮在悬停时除了放大还旋转45度 */
+}
+
+/* 💡 优化：根据主题显示或隐藏太阳/月亮图标 */
+html[data-theme="light"] .moon,
+html[data-theme="dark"] .sun {
+    display: none; /* 浅色模式下隐藏月亮，深色模式下隐藏太阳 */
+}
+
+/* --- 对话框 --- */
+dialog {
+    border: 1px solid var(--item-border-color); /* 边框 */
+    border-radius: 16px; /* 圆角 */
+    box-shadow: 0 4px 30px var(--shadow-color); /* 阴影 */
+    background-color: var(--dialog-bg-color); /* 背景颜色 */
+    backdrop-filter: blur(12px); /* 背景模糊 */
+    padding: 24px; /* 内边距 */
+    width: 400px; /* 宽度 */
+    color: var(--text-color); /* 文本颜色 */
+}
+
+dialog::backdrop {
+    background-color: rgba(0,0,0,.4); /* 对话框背后的遮罩层颜色 */
+}
+
+dialog form {
+    display: flex; /* 使用 flexbox 布局 */
+    flex-direction: column; /* 子元素垂直排列 */
+    gap: 16px; /* 子元素之间的间距 */
+}
+
+dialog h2 {
+    margin-top: 0; /* 移除顶部外边距 */
+    margin-bottom: 8px; /* 设置底部外边距 */
+    text-align: center; /* 文本居中 */
+}
+
+dialog label {
+    font-size: 1em; /* 字体大小 */
+    font-weight: 500; /* 字体粗细 */
+}
+
+#settings-dialog hr {
+    width: 100%; /* 宽度占满 */
+    border: none; /* 移除默认边框 */
+    border-top: 1px solid var(--hr-color); /* 使用自定义的顶部边框作为水平线 */
+}
+
+#settings-dialog .setting-item {
+    display: flex; /* 使用 flexbox 布局 */
+    flex-direction: column; /* 子元素垂直排列 */
+    align-items: flex-start; /* 子元素左对齐 */
+    gap: 10px; /* 间距 */
+}
+
+#settings-dialog label #icons-per-row-value {
+    font-weight: 700; /* 设置数字为粗体 */
+}
+
+/* --- 自定义 range-input (滑块) 样式 --- */
+#settings-dialog input[type=range] {
+    -webkit-appearance: none; /* 移除 Webkit 默认样式 */
+    appearance: none; /* 移除默认样式 */
+    width: 100%; /* 宽度占满 */
+    height: 8px; /* 高度 */
+    background: rgba(0,0,0,.3); /* 滑轨背景颜色 */
+    border-radius: 4px; /* 滑轨圆角 */
+    outline: none; /* 移除焦点轮廓 */
+    cursor: pointer; /* 鼠标样式为手型 */
+}
+
+#settings-dialog input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none; /* 移除 Webkit 默认样式 */
+    appearance: none; /* 移除默认样式 */
+    width: 20px; /* 滑块宽度 */
+    height: 20px; /* 滑块高度 */
+    background: #eee; /* 滑块背景颜色 */
+    border-radius: 50%; /* 滑块圆形 */
+    border: 1px solid rgba(0,0,0,.1); /* 滑块边框 */
+    box-shadow: 0 2px 5px var(--shadow-color); /* 滑块阴影 */
+}
+
+/* --- 自定义 select (下拉菜单) 样式 --- */
+#settings-dialog select {
+    appearance: none; /* 移除默认样式 */
+    width: 100%; /* 宽度占满 */
+    padding: 10px 12px; /* 内边距 */
+    border-radius: 8px; /* 圆角 */
+    border: 1px solid var(--item-border-color); /* 边框 */
+    background-color: var(--select-bg-color); /* 背景颜色 */
+    color: var(--text-color); /* 文本颜色 */
+    font-size: 1em; /* 字体大小 */
+    cursor: pointer; /* 鼠标样式为手型 */
+    background-image: var(--select-arrow); /* 使用自定义的箭头图标 */
+    background-repeat: no-repeat; /* 图标不重复 */
+    background-position: right 12px center; /* 图标位置 */
+}
+
+#settings-dialog .file-upload-wrapper {
+    display: flex; /* 使用 flexbox 布局 */
+    width: 100%; /* 宽度占满 */
+    gap: 10px; /* 间距 */
+}
+
+/* --- 自定义 file-input (文件上传) 样式 --- */
+#settings-dialog input[type=file] {
+    flex-grow: 1; /* 占据剩余空间 */
+    color: transparent; /* 隐藏原始的 "未选择任何文件" 文本 */
+}
+
+#settings-dialog input[type=file]::file-selector-button {
+    border: 1px solid var(--item-border-color); /* 边框 */
+    padding: 8px 16px; /* 内边距 */
+    border-radius: 50px; /* 圆角 */
+    background-color: var(--item-bg-color); /* 背景颜色 */
+    color: var(--text-color); /* 文本颜色 */
+    cursor: pointer; /* 鼠标样式为手型 */
+    transition: background-color .2s ease; /* 平滑过渡 */
+}
+
+#settings-dialog input[type=file]::file-selector-button:hover {
+    background-color: var(--item-bg-hover-color); /* 鼠标悬停时改变背景颜色 */
+}
+
+/* --- 对话框按钮 --- */
+.dialog-buttons {
+    display: flex; /* 使用 flexbox 布局 */
+    justify-content: flex-end; /* 按钮靠右对齐 */
+    gap: 10px; /* 按钮间距 */
+    margin-top: 10px; /* 与上方内容的间距 */
+    padding-top: 16px; /* 顶部内边距 */
+    border-top: 1px solid var(--hr-color); /* 顶部分隔线 */
+}
+
+.dialog-buttons button {
+    padding: 10px 20px; /* 内边距 */
+    border: 1px solid transparent; /* 透明边框 */
+    border-radius: 50px; /* 圆角 */
+    cursor: pointer; /* 鼠标样式为手型 */
+    font-size: 1em; /* 字体大小 */
+    font-weight: 500; /* 字体粗细 */
+    transition: all .2s ease; /* 平滑过渡 */
+}
+
+.btn-save {
+    background-color: rgba(10,132,255,.7); /* 背景颜色 (蓝色，半透明) */
+    color: #fff; /* 文本颜色 (白色) */
+    border-color: rgba(10,132,255,1); /* 边框颜色 (蓝色，不透明) */
+}
+
+.btn-save:hover {
+    background-color: rgba(10,132,255,1); /* 鼠标悬停时背景变为不透明 */
+    box-shadow: 0 2px 8px rgba(10,132,255,.4); /* 添加阴影 */
+}
+
+.btn-secondary {
+    background-color: var(--btn-secondary-bg); /* 背景颜色 */
+    color: var(--text-color); /* 文本颜色 */
+    border-color: var(--item-border-color); /* 边框颜色 */
+}
+
+.btn-secondary:hover {
+    background-color: var(--btn-secondary-hover-bg); /* 鼠标悬停时改变背景颜色 */
+}
+
+#reset-background-btn {
+    padding: 8px 16px;
+    border-radius: 50px;
+    border: 1px solid var(--item-border-color);
+    background-color: var(--item-bg-color);
+    color: var(--text-color);
+    cursor: pointer;
+    transition: all .2s ease;
+}
+
+#reset-background-btn:hover {
+    background-color: var(--item-bg-hover-color);
+}
+
+/* --- 添加站点对话框中的输入框 --- */
+#add-site-dialog input {
+    padding: 10px 12px; /* 内边距 */
+    border-radius: 8px; /* 圆角 */
+    border: 1px solid var(--item-border-color); /* 边框 */
+    background-color: var(--item-bg-color); /* 背景颜色 */
+    color: var(--text-color); /* 文本颜色 */
+    font-size: 1em; /* 字体大小 */
+}
+
+#add-site-dialog input[type=file] {
+    color: transparent; /* 隐藏文件输入框的默认文本 */
+}
+
+#add-site-dialog input:focus {
+    outline: none; /* 移除焦点轮廓 */
+    border-color: #0af; /* 获得焦点时改变边框颜色 */
+}
+
+/* --- 编辑模式 --- */
+@keyframes shake {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(-2deg); }
+    75% { transform: rotate(2deg); }
+}
+
+body.edit-mode .site-item {
+    animation: shake 0.25s infinite;
+}
+
+body.edit-mode .site-link {
+    cursor: default; /* 编辑模式下，链接不可点击 */
+}
+
+body.edit-mode .delete-site-btn {
+    opacity: 1;
+    pointer-events: auto; /* 编辑模式下，删除按钮可点击 */
+    transform: scale(1.1);
+}
+
+body.edit-mode .add-site-btn {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.edit-icon, .done-icon {
+    display: none;
+}
+
+#edit-sites-btn.editing .done-icon {
+    display: block;
+}
+
+#edit-sites-btn:not(.editing) .edit-icon {
+    display: block;
+}
