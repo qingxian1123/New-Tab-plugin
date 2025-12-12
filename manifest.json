@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Inspirational New Tab",
-  "version": "1.0",
+  "version": "1.2",
   "description": "A new tab page like chrome default new tab",
   "icons": {
     "48": "icons/icon48.png",
@@ -15,8 +15,7 @@
     "search"
   ],
   "host_permissions": [
-        "https://logo.clearbit.com/*",
-        "https://www.google.com/s2/favicons*",
-        "https://t0.gstatic.com/*" 
-    ]
+    "https://logo.clearbit.com/*",
+    "https://www.google.com/s2/favicons*"
+  ]
 }
