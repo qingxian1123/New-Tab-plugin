@@ -1,47 +1,75 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>New Tab</title>
-
     <script src="theme-loader.js"></script>
-    
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <main>                    
-            <div class="search-container">
-                <div class="time-widget">
-                    <div id="clock" class="clock">12:00</div>
-                </div>
+    <main>
+        <div class="clock-section">
+            <div id="clock" class="clock">00:00</div>
+            <div id="date" class="date"></div>
+        </div>
 
-                <form id="search-form">
-                    <input type="search" id="search-input" placeholder="" autocomplete="off" aria-label="Search the web">
-                </form>
-            </div>
+        <form id="search-form">
+            <input type="search" id="search-input" placeholder="" autocomplete="off" aria-label="Search the web">
+        </form>
+
         <div id="sites-container" class="sites-container"></div>
     </main>
 
+    <!-- Add Site Dialog -->
     <dialog id="add-site-dialog">
         <form id="add-site-form">
-            <h2>Add New Site</h2>
-            <label for="site-name">Name:</label>
+            <h2>添加快捷方式</h2>
+            <label for="site-name">名称</label>
             <input type="text" id="site-name" required>
-            <label for="site-url">URL:</label>
-            <input type="text" id="site-url" placeholder="" required>
-            
+            <label for="site-url">网址</label>
+            <input type="text" id="site-url" placeholder="example.com" required>
             <div class="dialog-buttons">
-                <button type="submit" class="btn-save">Save</button>
-                <button type="button" id="cancel-btn" class="btn-secondary">Cancel</button>
+                <button type="button" id="cancel-btn" class="btn-secondary">取消</button>
+                <button type="submit" class="btn-save">保存</button>
             </div>
         </form>
     </dialog>
-    
+
+    <!-- Settings Dialog -->
+    <dialog id="settings-dialog">
+        <form id="settings-form">
+            <h2>设置</h2>
+            <div class="setting-item">
+                <label for="icons-per-row">每行图标数：<span id="icons-per-row-value">6</span></label>
+                <input type="range" id="icons-per-row" min="6" max="10">
+            </div>
+            <div class="setting-item">
+                <label for="icon-radius-slider">图标圆角：<span id="icon-radius-value">20</span>px</label>
+                <input type="range" id="icon-radius-slider" min="0" max="32" value="20">
+            </div>
+            <hr>
+            <div class="setting-item">
+                <label for="background-upload">自定义壁纸</label>
+                <div class="file-upload-wrapper">
+                    <input type="file" id="background-upload" accept="image/*">
+                    <button type="button" id="reset-background-btn" class="btn-secondary" title="重置壁纸" aria-label="Reset Background">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+                    </button>
+                </div>
+            </div>
+            <div class="dialog-buttons">
+                <button type="button" id="settings-cancel-btn" class="btn-secondary">取消</button>
+                <button type="submit" class="btn-save">保存</button>
+            </div>
+        </form>
+    </dialog>
+
+    <!-- Control Buttons -->
     <div class="ui-controls">
         <button id="edit-sites-btn" class="settings-btn" aria-label="Edit Sites">
             <svg class="edit-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg>
-            <svg class="done-icon" style="display: none;" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <svg class="done-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
         </button>
         <button id="theme-toggle-btn" class="theme-btn" aria-label="Toggle Theme">
             <svg class="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
@@ -51,36 +79,6 @@
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
         </button>
     </div>
-
-    <dialog id="settings-dialog">
-        <form id="settings-form">
-            <h2>Settings</h2>
-            <div class="setting-item">
-                <label for="icons-per-row">Icons per row: <span id="icons-per-row-value">6</span></label>
-                <input type="range" id="icons-per-row" min="6" max="10">
-            </div>
-            
-            <div class="setting-item">
-                <label for="icon-radius-slider">Icon Corner Radius: <span id="icon-radius-value">32</span>px</label>
-                <input type="range" id="icon-radius-slider" min="0" max="32" value="32">
-            </div>
-
-            <hr>
-            <div class="setting-item">
-                <label for="background-upload">Custom Background:</label>
-                <div class="file-upload-wrapper">
-                    <input type="file" id="background-upload" accept="image/*">
-                    <button type="button" id="reset-background-btn" class="btn-secondary" title="Reset Background" aria-label="Reset Background">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
-                    </button>
-                </div>
-            </div>
-            <div class="dialog-buttons">
-                <button type="button" id="settings-cancel-btn" class="btn-secondary">Cancel</button>
-                <button type="submit" class="btn-save">Save</button>
-            </div>
-        </form>
-    </dialog>
 
     <script src="main.js"></script>
 </body>

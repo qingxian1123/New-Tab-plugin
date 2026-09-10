@@ -1,11 +1,11 @@
 {
   "manifest_version": 3,
   "name": "Inspirational New Tab",
-  "version": "1.2",
-  "description": "A new tab page like chrome default new tab",
+  "version": "2.0",
+  "description": "A clean, modern new tab page",
   "icons": {
-    "48": "icons/icon48.png",
-    "128": "icons/icon128.png"
+    "48": "icon/icon48.png",
+    "128": "icon/icon128.png"
   },
   "chrome_url_overrides": {
     "newtab": "index.html"
@@ -15,7 +15,6 @@
     "search"
   ],
   "host_permissions": [
-    "https://logo.clearbit.com/*",
     "https://www.google.com/s2/favicons*"
   ]
 }
