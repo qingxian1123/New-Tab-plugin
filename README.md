@@ -13,7 +13,7 @@ Reload the extension after changing its files. This version requests the `bookma
 ## Shortcut area
 
 - Tabs stay at the bottom of the viewport; checking or unchecking folders stages changes until Save. Removing a tab does not delete browser bookmarks.
-- Website cards contain a brand icon, title, and hostname. The entire card is a keyboard-accessible link.
+- Website cards contain a brand icon and title. The entire card is a keyboard-accessible link.
 - Simple Icons SVGs cover common brands. Other sites use Chrome's favicon cache, with a Lucide globe as fallback. See [icon attribution](icon/README.md).
 - The grid respects the desktop column setting and switches to four or three columns in smaller windows.
 - Legacy saved shortcuts remain in local storage; no default speed-dial tab is added.

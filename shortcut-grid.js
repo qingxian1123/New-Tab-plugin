@@ -85,7 +85,6 @@ class ShortcutGrid {
         // Bookmarklets and data URLs must not execute inside the extension page.
         if (!['http:', 'https:', 'ftp:', 'file:', 'chrome:', 'edge:'].includes(url.protocol)) return null;
         const title = site.title || site.name || url.hostname || '未命名书签';
-        const host = url.hostname.replace(/^www\./, '') || '本地文件';
         const item = document.createElement('li');
         item.className = 'shortcut-item';
         const link = document.createElement('a');
@@ -96,10 +95,7 @@ class ShortcutGrid {
         const name = document.createElement('span');
         name.className = 'shortcut-title';
         name.textContent = title;
-        const domain = document.createElement('span');
-        domain.className = 'shortcut-domain';
-        domain.textContent = host;
-        link.append(name, domain, ShortcutIcons.create('arrow-up-right', 'shortcut-open'));
+        link.append(name, ShortcutIcons.create('arrow-up-right', 'shortcut-open'));
         item.appendChild(link);
         return item;
     }
