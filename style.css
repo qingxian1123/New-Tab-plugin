@@ -51,6 +51,7 @@
 }
 
 html[data-theme="dark"] {
+    color-scheme: dark;
     --color-bg: #0f0f0f;
     --color-surface: #1a1a1a;
     --color-surface-hover: #242424;
@@ -98,6 +99,7 @@ body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', Roboto, Helvetica, Arial, sans-serif;
     color: var(--color-text);
     height: 100vh;
+    padding-bottom: 40px;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -138,9 +140,14 @@ body.has-bg::after {
 
 /* --- Layout --- */
 main {
-    max-width: 550px;
+    max-height: calc(100dvh - 120px);
+    flex-shrink: 0;
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-border) transparent;
+    overflow-y: auto;
+    max-width: 824px;
     width: 100%;
-    padding: 20px;
+    padding: 20px 32px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -149,13 +156,13 @@ main {
 
 /* --- Clock & Date --- */
 .clock-section {
-    margin-bottom: 32px;
+    margin-bottom: 24px;
     user-select: none;
     cursor: default;
 }
 
 .clock {
-    font-size: 4.5rem;
+    font-size: 3.75rem;
     font-weight: 600;
     color: var(--color-text);
     line-height: 1;
@@ -175,7 +182,7 @@ main {
 #search-form {
     width: 100%;
     max-width: 480px;
-    margin-bottom: 44px;
+    margin-bottom: 32px;
 }
 
 #search-input {
@@ -202,109 +209,315 @@ main {
     color: var(--color-text-muted);
 }
 
-/* --- Sites Grid --- */
-.sites-container {
-    display: grid;
-    grid-template-columns: repeat(var(--icons-per-row, 6), var(--icon-size));
-    gap: var(--icon-gap, 32px);
-    justify-content: center;
-    justify-items: center;
+/* --- Shortcut workspace --- */
+.shortcuts-section {
+    width: 100%;
 }
-
-/* --- Site Card --- */
-.site-item {
+.shortcuts-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    gap: 16px;
+    padding: 0 12px 22px;
+    text-align: left;
+}
+.section-eyebrow {
+    display: block;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    color: var(--color-text-secondary);
+    margin-bottom: 8px;
+}
+.shortcuts-heading-group h1 {
+    font-size: 20px;
+    line-height: 1.4;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+}
+.shortcuts-count {
+    color: var(--color-text-secondary);
+    font-size: 11px;
+    white-space: nowrap;
+    padding-bottom: 3px;
+}
+.shortcuts-grid {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(var(--icons-per-row), minmax(0, 1fr));
+    gap: 10px;
+    width: 100%;
+}
+.shortcut-item {
+    min-width: 0;
+}
+.shortcut-card {
     position: relative;
+    min-height: 140px;
+    padding: 14px 8px 12px;
     display: flex;
     flex-direction: column;
     align-items: center;
     text-decoration: none;
+    border: 1px solid transparent;
+    border-radius: 18px;
+    color: var(--color-text);
+    transition: background-color var(--t-fast), border-color var(--t-fast), transform var(--t-fast);
 }
-
-.site-link {
-    width: var(--icon-size);
-    height: var(--icon-size);
-    border-radius: var(--icon-corner-radius, 20px);
-    background-color: var(--color-surface);
-    border: 1px solid var(--color-border);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 8px;
-    box-sizing: border-box;
-    transition: transform var(--t-fast), border-color var(--t-fast);
-    cursor: pointer;
+.shortcut-card:hover, .shortcut-card:focus-visible {
+    background: var(--color-surface);
+    border-color: var(--color-border);
+    transform: translateY(-3px);
 }
-
-.site-link:hover {
-    transform: scale(1.08);
-    border-color: var(--color-text-muted);
+.shortcut-icon {
+    --brand-color: #8091aa;
+    width: 60px;
+    height: 60px;
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    border: 1px solid color-mix(in srgb, var(--brand-color) 20%, var(--color-border));
+    border-radius: var(--icon-corner-radius);
+    background: color-mix(in srgb, var(--brand-color) 9%, var(--color-surface));
+    color: var(--brand-color);
+    margin-bottom: 14px;
 }
-
-.site-icon {
-    width: 100%;
-    height: 100%;
-    border-radius: calc(var(--icon-corner-radius, 20px) - 6px);
+.ui-icon {
+    display: inline-block;
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    background: currentColor;
+    mask: var(--icon-url) center / contain no-repeat;
+}
+.shortcut-icon .ui-icon {
+    width: 28px;
+    height: 28px;
+}
+.shortcut-favicon {
+    width: 32px;
+    height: 32px;
     object-fit: contain;
+}
+.shortcut-title {
     display: block;
-    background-color: transparent;
-}
-
-.site-name {
-    margin-top: 8px;
-    font-size: 12px;
-    color: var(--color-text-secondary);
-    white-space: nowrap;
+    width: 100%;
     overflow: hidden;
+    white-space: nowrap;
     text-overflow: ellipsis;
-    max-width: calc(var(--icon-size) + 20px);
-    font-weight: 400;
-}
-
-/* --- Add Site Button --- */
-.add-site-btn {
-    width: var(--icon-size);
-    height: var(--icon-size);
-    border-radius: var(--icon-corner-radius, 20px);
-    border: 1.5px dashed var(--color-border);
-    color: var(--color-text-muted);
-    font-size: 24px;
-    background: transparent;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    transition: border-color var(--t-fast), color var(--t-fast), transform var(--t-fast);
-}
-
-.add-site-btn:hover {
-    border-color: var(--color-text-secondary);
-    color: var(--color-text-secondary);
-    transform: scale(1.08);
-}
-
-/* --- Delete Button --- */
-.delete-site-btn {
-    position: absolute;
-    top: -6px;
-    right: -6px;
-    width: 22px;
-    height: 22px;
-    border-radius: 50%;
-    background-color: var(--color-danger);
-    color: #fff;
-    border: 2px solid var(--color-bg);
-    cursor: pointer;
     font-size: 12px;
-    line-height: 1;
+    font-weight: 500;
+    line-height: 1.6;
+}
+.shortcut-domain {
+    display: block;
+    width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    margin-top: 3px;
+    color: var(--color-text-secondary);
+    font-size: 10px;
+    line-height: 1.5;
+}
+.shortcut-open {
+    position: absolute;
+    right: 9px;
+    top: 9px;
+    width: 13px;
+    height: 13px;
+    color: var(--color-text-secondary);
+    opacity: 0;
+    transition: opacity var(--t-fast);
+}
+.shortcut-card:hover .shortcut-open, .shortcut-card:focus-visible .shortcut-open {
+    opacity: 1;
+}
+.shortcuts-empty, .shortcuts-loading {
+    grid-column: 1 / -1;
+    padding: 40px 20px;
+    text-align: center;
+    border: 1px dashed var(--color-border);
+    border-radius: 20px;
+    color: var(--color-text-secondary);
+}
+.empty-icon {
+    width: 28px;
+    height: 28px;
+    color: var(--color-accent);
+    margin-bottom: 18px;
+}
+.shortcuts-empty h3 {
+    font-size: 17px;
+    font-weight: 500;
+    color: var(--color-text);
+    margin-bottom: 10px;
+}
+.shortcuts-empty p {
+    font-size: 12px;
+    line-height: 1.8;
+}
+.choose-folders-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 24px;
+    padding: 10px 16px;
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    background: var(--color-surface);
+    color: var(--color-text);
+    font: inherit;
+    font-size: 12px;
+    cursor: pointer;
+}
+.choose-folders-btn:hover {
+    border-color: var(--color-accent);
+}
+a:focus-visible, button:focus-visible, input:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 4px;
+}
+
+/* --- Tab Bar (viewport bottom) --- */
+.tab-bar {
+    position: fixed;
+    bottom: max(28px, env(safe-area-inset-bottom));
+    left: 50%;
+    transform: translateX(-50%);
+    max-width: calc(100vw - 360px);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px;
+    background: var(--color-bg);
+    border-radius: var(--radius-capsule);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+}
+
+.tab-bar::-webkit-scrollbar {
+    display: none;
+}
+
+.tab-btn {
+    flex-shrink: 0;
+    padding: 6px 16px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-capsule);
+    background-color: var(--color-surface);
+    color: var(--color-text-secondary);
+    font-size: 0.8rem;
+    font-weight: 500;
+    font-family: inherit;
+    cursor: pointer;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: background-color var(--t-fast), color var(--t-fast), border-color var(--t-fast);
+}
+
+.tab-btn:hover {
+    border-color: var(--color-text-muted);
+    color: var(--color-text);
+}
+
+.tab-btn.active {
+    background-color: var(--color-accent);
+    color: #ffffff;
+    border-color: var(--color-accent);
+}
+
+.tab-add-btn {
+    position: sticky;
+    right: 0;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    font-size: 18px;
     display: flex;
     align-items: center;
     justify-content: center;
-    opacity: 0;
-    transform: scale(0.8);
-    transition: opacity var(--t-fast), transform var(--t-fast);
-    z-index: 10;
-    pointer-events: none;
-    padding: 0;
+    flex-shrink: 0;
+    border-style: dashed;
+    color: var(--color-text-muted);
+}
+
+.tab-add-btn:hover {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+}
+
+/* --- Folder Picker Dialog --- */
+.folder-picker-hint {
+    font-size: 0.85rem;
+    color: var(--color-text-secondary);
+}
+
+.folder-tree-btn input {
+    flex-shrink: 0;
+    accent-color: var(--color-accent);
+    width: 16px;
+    height: 16px;
+}
+
+.folder-tree-btn:has(input:checked) {
+    background: var(--color-surface-active);
+}
+
+@media (max-width: 600px) {
+    .tab-bar {
+        max-width: calc(100vw - 32px);
+    }
+
+    body .ui-controls {
+        bottom: 84px;
+        right: 16px;
+    }
+}
+
+.folder-picker-inner {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.folder-tree {
+    max-height: 360px;
+    overflow-y: auto;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-input);
+    padding: 4px;
+}
+
+.folder-tree-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 8px 10px;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--color-text);
+    font-size: 0.875rem;
+    font-family: inherit;
+    cursor: pointer;
+    text-align: left;
+    transition: background-color var(--t-fast);
+}
+
+.folder-tree-btn:hover {
+    background-color: var(--color-surface-hover);
+}
+
+.folder-tree-btn svg {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
 }
 
 /* --- Control Buttons --- */
@@ -352,22 +565,10 @@ html[data-theme="dark"] .sun {
     display: none;
 }
 
-/* Edit button icon toggle */
-.edit-icon,
-.done-icon {
-    display: none;
-}
-
-#edit-sites-btn.editing .done-icon {
-    display: block;
-}
-
-#edit-sites-btn:not(.editing) .edit-icon {
-    display: block;
-}
-
 /* --- Dialogs --- */
 dialog {
+    margin: auto;
+    max-width: calc(100vw - 32px);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-card);
     background-color: var(--color-surface);
@@ -476,23 +677,6 @@ input[type="file"]::file-selector-button:hover {
     background-color: var(--color-surface-hover);
 }
 
-/* Text inputs in add-site dialog */
-#add-site-dialog input[type="text"] {
-    padding: 10px 14px;
-    border-radius: var(--radius-input);
-    border: 1px solid var(--color-border);
-    background-color: var(--color-bg);
-    color: var(--color-text);
-    font-size: 0.9rem;
-    font-family: inherit;
-    outline: none;
-    transition: border-color var(--t-fast);
-}
-
-#add-site-dialog input:focus {
-    border-color: var(--color-accent);
-}
-
 /* --- Dialog Buttons --- */
 .dialog-buttons {
     display: flex;
@@ -549,32 +733,60 @@ input[type="file"]::file-selector-button:hover {
     background-color: var(--color-surface-hover);
 }
 
-/* --- Edit Mode --- */
-@keyframes shake {
-    0%, 100% { transform: rotate(0deg); }
-    25% { transform: rotate(-1.5deg); }
-    75% { transform: rotate(1.5deg); }
+/* Fit the card grid to the viewport, preserving the desktop density setting. */
+@media (max-width: 800px) {
+    .shortcuts-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+    main {
+        padding: 20px;
+    }
 }
-
-body.edit-mode .site-item {
-    animation: shake 0.3s infinite;
+@media (max-width: 480px) {
+    body {
+        padding-bottom: 80px;
+    }
+    .shortcuts-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 4px;
+    }
+    main {
+        max-height: calc(100dvh - 220px);
+        padding: 16px;
+    }
+    .shortcuts-header {
+        padding-inline: 4px;
+    }
+    .section-eyebrow {
+        font-size: 9px;
+    }
+    .shortcuts-heading-group h1 {
+        font-size: 18px;
+    }
+    .shortcut-card {
+        padding-inline: 6px;
+        min-height: 136px;
+    }
+    .shortcut-icon {
+        width: 54px;
+        height: 54px;
+    }
+    .clock {
+        font-size: 3.5rem;
+    }
+    .clock-section {
+        margin-bottom: 24px;
+    }
+    #search-form {
+        margin-bottom: 28px;
+    }
 }
-
-body.edit-mode .site-link {
-    cursor: default;
-}
-
-body.edit-mode .site-link:hover {
-    transform: none;
-}
-
-body.edit-mode .delete-site-btn {
-    opacity: 1;
-    pointer-events: auto;
-    transform: scale(1);
-}
-
-body.edit-mode .add-site-btn {
-    opacity: 0;
-    pointer-events: none;
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        transition: none !important;
+        animation: none !important;
+    }
+    .shortcut-card:hover, .shortcut-card:focus-visible {
+        transform: none;
+    }
 }

@@ -12,9 +12,8 @@
   },
   "permissions": [
     "storage",
-    "search"
-  ],
-  "host_permissions": [
-    "https://www.google.com/s2/favicons*"
+    "search",
+    "bookmarks",
+    "favicon"
   ]
 }

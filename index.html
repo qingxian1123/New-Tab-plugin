@@ -17,23 +17,31 @@
         <form id="search-form">
             <input type="search" id="search-input" placeholder="" autocomplete="off" aria-label="Search the web">
         </form>
+        <section class="shortcuts-section" aria-labelledby="shortcuts-heading">
+            <header class="shortcuts-header">
+                <div class="shortcuts-heading-group">
+                    <span class="section-eyebrow">YOUR EVERYDAY SPACE</span>
+                    <h1 id="shortcuts-heading">快捷访问</h1>
+                </div>
+                <span id="shortcuts-count" class="shortcuts-count" role="status"></span>
+            </header>
+            <ul id="sites-container" class="shortcuts-grid" aria-labelledby="shortcuts-heading"></ul>
+        </section>
 
-        <div id="sites-container" class="sites-container"></div>
     </main>
+    <nav class="tab-bar" id="tab-bar" aria-label="书签标签"></nav>
 
-    <!-- Add Site Dialog -->
-    <dialog id="add-site-dialog">
-        <form id="add-site-form">
-            <h2>添加快捷方式</h2>
-            <label for="site-name">名称</label>
-            <input type="text" id="site-name" required>
-            <label for="site-url">网址</label>
-            <input type="text" id="site-url" placeholder="example.com" required>
+    <!-- Bookmark Folder Picker Dialog -->
+    <dialog id="folder-picker-dialog">
+        <div class="folder-picker-inner">
+            <h2>选择标签</h2>
+            <p class="folder-picker-hint">勾选文件夹添加标签，取消勾选移除标签。</p>
+            <div id="folder-tree" class="folder-tree"></div>
             <div class="dialog-buttons">
-                <button type="button" id="cancel-btn" class="btn-secondary">取消</button>
-                <button type="submit" class="btn-save">保存</button>
+                <button type="button" id="folder-picker-cancel-btn" class="btn-secondary">取消</button>
+                <button type="button" id="folder-picker-save-btn" class="btn-save">保存</button>
             </div>
-        </form>
+        </div>
     </dialog>
 
     <!-- Settings Dialog -->
@@ -67,11 +75,7 @@
 
     <!-- Control Buttons -->
     <div class="ui-controls">
-        <button id="edit-sites-btn" class="settings-btn" aria-label="Edit Sites">
-            <svg class="edit-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg>
-            <svg class="done-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-        </button>
-        <button id="theme-toggle-btn" class="theme-btn" aria-label="Toggle Theme">
+<button id="theme-toggle-btn" class="theme-btn" aria-label="Toggle Theme">
             <svg class="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
             <svg class="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
         </button>
@@ -80,6 +84,7 @@
         </button>
     </div>
 
+    <script src="shortcut-grid.js"></script>
     <script src="main.js"></script>
 </body>
 </html>

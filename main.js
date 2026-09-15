@@ -2,9 +2,7 @@ const App = {
     // --- DOM 缓存 ---
     elements: {
         sitesContainer: document.getElementById('sites-container'),
-        addSiteDialog: document.getElementById('add-site-dialog'),
-        addSiteForm: document.getElementById('add-site-form'),
-        cancelBtn: document.getElementById('cancel-btn'),
+
         searchForm: document.getElementById('search-form'),
         searchInput: document.getElementById('search-input'),
         settingsBtn: document.getElementById('settings-btn'),
@@ -15,12 +13,16 @@ const App = {
         iconsPerRowValue: document.getElementById('icons-per-row-value'),
         backgroundUploadInput: document.getElementById('background-upload'),
         resetBackgroundBtn: document.getElementById('reset-background-btn'),
-        editSitesBtn: document.getElementById('edit-sites-btn'),
+
         themeToggleBtn: document.getElementById('theme-toggle-btn'),
         iconRadiusSlider: document.getElementById('icon-radius-slider'),
         iconRadiusValue: document.getElementById('icon-radius-value'),
         clock: document.getElementById('clock'),
         date: document.getElementById('date'),
+        tabBar: document.getElementById('tab-bar'),
+        folderPickerDialog: document.getElementById('folder-picker-dialog'),
+        folderPickerCancelBtn: document.getElementById('folder-picker-cancel-btn'),
+        folderTree: document.getElementById('folder-tree'),
     },
 
     // --- 常量 ---
@@ -31,12 +33,6 @@ const App = {
             iconRadius: 20,
         },
         MIN_ICONS_PER_ROW: 6,
-        ICON_WIDTH: 64,
-        TARGET_ROW_WIDTH: 550,
-        MIN_ICON_GAP: 16,
-        MAX_ICON_SIZE: 512 * 1024,
-        ALLOWED_IMAGE_TYPES: ['image/png', 'image/jpeg', 'image/webp', 'image/svg+xml'],
-        ICON_FETCH_TIMEOUT: 5000,
         GREETING_DELAY: 500,
         GREETING_TYPE_SPEED: 100,
         GREETING_DISPLAY_TIME: 3000,
@@ -47,9 +43,11 @@ const App = {
     state: {
         theme: 'dark',
         settings: {},
-        sites: [],
-        isEditMode: false,
+
         hasCustomBackground: false,
+        activeTab: null,
+        bookmarkTabs: [],
+        selectedFolders: new Map(),
     },
 
     // --- 日志 ---
@@ -70,7 +68,11 @@ const App = {
         await this.loadState();
         this.applyTheme();
         this.applySettings();
-        this.renderSites();
+        this.grid = new ShortcutGrid(this.elements.sitesContainer,
+            document.getElementById('shortcuts-heading'), document.getElementById('shortcuts-count'),
+            () => this.showFolderPicker());
+        this.renderTabBar();
+        this.switchTab(this.state.bookmarkTabs[0]?.id || null);
         this.bindEvents();
         this.startClock();
         await this.applyBackground();
@@ -102,11 +104,11 @@ const App = {
     // --- 加载状态 ---
     async loadState() {
         const { theme, settings } = await chrome.storage.sync.get(['theme', 'settings']);
-        const { savedSites } = await chrome.storage.local.get(['savedSites']);
+        const { bookmarkTabs } = await chrome.storage.local.get('bookmarkTabs');
 
         this.state.theme = theme || 'dark';
         this.state.settings = { ...this.constants.DEFAULT_SETTINGS, ...settings };
-        this.state.sites = savedSites || [];
+        this.state.bookmarkTabs = bookmarkTabs || [];
 
         if (this.state.settings.iconsPerRow < this.constants.MIN_ICONS_PER_ROW) {
             this.state.settings.iconsPerRow = this.constants.MIN_ICONS_PER_ROW;
@@ -231,18 +233,10 @@ const App = {
     applySettings() {
         const { settings } = this.state;
         const { iconsPerRowSlider, iconsPerRowValue, iconRadiusSlider, iconRadiusValue } = this.elements;
-        const { ICON_WIDTH, TARGET_ROW_WIDTH, MIN_ICON_GAP } = this.constants;
-
         const N = settings.iconsPerRow;
-        const totalGapSpace = TARGET_ROW_WIDTH - (N * ICON_WIDTH);
-        const gap = (N > 1) ? Math.max(MIN_ICON_GAP, totalGapSpace / (N - 1)) : 0;
-
-        document.documentElement.style.setProperty('--icon-gap', `${gap}px`);
         document.documentElement.style.setProperty('--icons-per-row', N);
-        document.documentElement.style.setProperty('--icon-corner-radius', `${settings.iconRadius}px`);
-
-        const newMaxWidth = N * ICON_WIDTH + (N - 1) * gap;
-        document.querySelector('main').style.maxWidth = `${newMaxWidth}px`;
+        document.documentElement.style.setProperty('--icon-corner-radius', settings.iconRadius + 'px');
+        document.querySelector('main').style.maxWidth = (N * 124 + 80) + 'px';
 
         iconsPerRowSlider.value = N;
         iconsPerRowValue.textContent = N;
@@ -262,173 +256,139 @@ const App = {
     },
 
     // ==========================================
-    //  网站快捷方式
+    //  Tab 栏（动态渲染）
     // ==========================================
 
-    renderSites() {
-        const { sitesContainer } = this.elements;
-        const fragment = document.createDocumentFragment();
+    renderTabBar() {
+        const tabBar = this.elements.tabBar;
+        tabBar.innerHTML = '';
 
-        this.state.sites.forEach(site => {
-            const siteItem = document.createElement('div');
-            siteItem.className = 'site-item';
+        // 书签文件夹 tabs
+        this.state.bookmarkTabs.forEach(tab => {
+            const tabBtn = document.createElement('button');
+            tabBtn.className = 'tab-btn' + (this.state.activeTab === tab.id ? ' active' : '');
+            tabBtn.dataset.tab = tab.id;
+            tabBtn.setAttribute('aria-current', String(this.state.activeTab === tab.id));
 
-            const siteLink = document.createElement('a');
-            siteLink.href = site.url;
-            siteLink.className = 'site-link';
+            const label = document.createElement('span');
+            label.textContent = tab.title;
+            tabBtn.appendChild(label);
 
-            const siteIcon = document.createElement('img');
-            siteIcon.className = 'site-icon';
-            siteIcon.alt = site.name;
-
-            if (site.icon) {
-                siteIcon.src = site.icon;
-            } else {
-                this.fetchAndCacheIcon(site, siteIcon);
-            }
-
-            const siteName = document.createElement('p');
-            siteName.className = 'site-name';
-            siteName.textContent = site.name;
-
-            const deleteBtn = document.createElement('button');
-            deleteBtn.className = 'delete-site-btn';
-            deleteBtn.dataset.id = site.id;
-            deleteBtn.textContent = '×';
-
-            siteLink.appendChild(siteIcon);
-            siteItem.appendChild(siteLink);
-            siteItem.appendChild(siteName);
-            siteItem.appendChild(deleteBtn);
-            fragment.appendChild(siteItem);
+            tabBtn.addEventListener('click', () => this.switchTab(tab.id));
+            tabBar.appendChild(tabBtn);
         });
 
-        const addSiteBtn = document.createElement('button');
-        addSiteBtn.id = 'add-site-btn';
-        addSiteBtn.className = 'add-site-btn';
-        addSiteBtn.textContent = '+';
-        fragment.appendChild(addSiteBtn);
-
-        sitesContainer.innerHTML = '';
-        sitesContainer.appendChild(fragment);
+        // 添加按钮
+        const addBtn = document.createElement('button');
+        addBtn.className = 'tab-btn tab-add-btn';
+        addBtn.appendChild(ShortcutIcons.create('plus'));
+        addBtn.title = '选择标签';
+        addBtn.setAttribute('aria-label', '选择标签');
+        addBtn.addEventListener('click', () => this.showFolderPicker());
+        tabBar.appendChild(addBtn);
     },
 
-    // 生成字母头像（扁平配色）
-    getDefaultIcon(name) {
-        const canvas = document.createElement('canvas');
-        canvas.width = 128;
-        canvas.height = 128;
-        const ctx = canvas.getContext('2d');
-
-        const hue = name.charCodeAt(0) * 137.5 % 360;
-        ctx.fillStyle = `hsl(${hue}, 45%, 58%)`;
-        ctx.fillRect(0, 0, 128, 128);
-
-        ctx.fillStyle = '#fff';
-        ctx.font = '600 56px -apple-system, BlinkMacSystemFont, sans-serif';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(name.charAt(0).toUpperCase(), 64, 68);
-
-        return canvas.toDataURL('image/png');
-    },
-
-    // 压缩图片为 webp
-    async compressImage(blob, maxWidth = 128, maxHeight = 128) {
-        return new Promise((resolve) => {
-            const img = new Image();
-            img.onload = () => {
-                const canvas = document.createElement('canvas');
-                const ctx = canvas.getContext('2d');
-
-                let { width, height } = img;
-                if (width > maxWidth || height > maxHeight) {
-                    const ratio = Math.min(maxWidth / width, maxHeight / height);
-                    width *= ratio;
-                    height *= ratio;
-                }
-
-                canvas.width = width;
-                canvas.height = height;
-                ctx.drawImage(img, 0, 0, width, height);
-
-                resolve(canvas.toDataURL('image/webp', 0.85));
-            };
-            img.onerror = () => resolve(null);
-            img.src = URL.createObjectURL(blob);
-        });
-    },
-
-    // 获取并缓存图标（仅 Google Favicons）
-    async fetchAndCacheIcon(site, siteIconElement) {
-        const iconUrl = `https://www.google.com/s2/favicons?sz=128&domain_url=${encodeURIComponent(site.url)}`;
-
-        try {
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), this.constants.ICON_FETCH_TIMEOUT);
-
-            const response = await fetch(iconUrl, { signal: controller.signal });
-            clearTimeout(timeoutId);
-
-            if (!response.ok) throw new Error('Icon fetch failed');
-            const blob = await response.blob();
-
-            if (blob.size > this.constants.MAX_ICON_SIZE) {
-                throw new Error('Image too large');
-            }
-
-            const compressed = await this.compressImage(blob, 128, 128);
-            if (!compressed) throw new Error('Compression failed');
-
-            siteIconElement.src = compressed;
-            const siteToUpdate = this.state.sites.find(s => s.id === site.id);
-            if (siteToUpdate) {
-                siteToUpdate.icon = compressed;
-                await chrome.storage.local.set({ savedSites: this.state.sites });
-            }
-        } catch (error) {
-            // 所有获取失败，使用字母头像
-            const defaultIcon = this.getDefaultIcon(site.name);
-            siteIconElement.src = defaultIcon;
-            const siteToUpdate = this.state.sites.find(s => s.id === site.id);
-            if (siteToUpdate) {
-                siteToUpdate.icon = defaultIcon;
-                await chrome.storage.local.set({ savedSites: this.state.sites });
-            }
-        }
-    },
-
-    async addSite(name, url) {
-        const newSite = { id: Date.now(), name, url, icon: null };
-        this.state.sites.push(newSite);
-        await chrome.storage.local.set({ savedSites: this.state.sites });
-        this.renderSites();
-    },
-
-    async deleteSite(siteId) {
-        this.state.sites = this.state.sites.filter(site => site.id !== siteId);
-        await chrome.storage.local.set({ savedSites: this.state.sites });
-        this.renderSites();
-    },
-
-    // ==========================================
-    //  编辑模式
-    // ==========================================
-
-    toggleEditMode() {
-        this.state.isEditMode = !this.state.isEditMode;
-        document.body.classList.toggle('edit-mode', this.state.isEditMode);
-        this.elements.editSitesBtn.classList.toggle('editing', this.state.isEditMode);
-
-        const editIcon = this.elements.editSitesBtn.querySelector('.edit-icon');
-        const doneIcon = this.elements.editSitesBtn.querySelector('.done-icon');
-        if (this.state.isEditMode) {
-            editIcon.style.display = 'none';
-            doneIcon.style.display = 'block';
+    switchTab(tabId) {
+        this.state.activeTab = tabId;
+        this.renderTabBar();
+        if (!tabId) {
+            this.grid.showUnselected();
         } else {
-            editIcon.style.display = 'block';
-            doneIcon.style.display = 'none';
+            const tab = this.state.bookmarkTabs.find(tab => tab.id === tabId);
+            this.grid.showLoading(tab?.title || '快捷访问');
+            this.loadBookmarkFolder(tabId);
         }
+    },
+
+    // ==========================================
+    //  书签文件夹 Tab 管理
+    // ==========================================
+
+    async removeBookmarkTab(folderId) {
+        this.state.bookmarkTabs = this.state.bookmarkTabs.filter(t => t.id !== folderId);
+        await chrome.storage.local.set({ bookmarkTabs: this.state.bookmarkTabs });
+
+        if (this.state.activeTab === folderId) {
+            this.switchTab(this.state.bookmarkTabs[0]?.id || null);
+        }
+        this.renderTabBar();
+    },
+
+    // ==========================================
+    //  书签文件夹选择器
+    // ==========================================
+
+    async showFolderPicker() {
+        try {
+            const tree = await chrome.bookmarks.getTree();
+            this.state.selectedFolders = new Map(this.state.bookmarkTabs.map(tab => [tab.id, { ...tab }]));
+            this.renderFolderTree(tree[0].children);
+            this.elements.folderPickerDialog.showModal();
+        } catch (e) {
+            this.error('Failed to load bookmark tree', e);
+        }
+    },
+
+    renderFolderTree(nodes, container, depth) {
+        const target = container || this.elements.folderTree;
+        const d = depth || 0;
+        if (!container) target.innerHTML = '';
+
+        nodes.forEach(node => {
+            if (node.children === undefined) return; // 跳过非文件夹
+
+            const item = document.createElement('div');
+            item.style.paddingLeft = `${d * 20}px`;
+
+            const btn = document.createElement('label');
+            btn.className = 'folder-tree-btn';
+            btn.appendChild(ShortcutIcons.create('folder'));
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.checked = this.state.selectedFolders.has(node.id);
+            btn.prepend(checkbox);
+
+            const nameSpan = document.createElement('span');
+            nameSpan.textContent = node.title || '未命名文件夹';
+            btn.appendChild(nameSpan);
+
+            checkbox.addEventListener('change', () => {
+                if (checkbox.checked) {
+                    this.state.selectedFolders.set(node.id, { id: node.id, title: node.title || '未命名文件夹' });
+                } else {
+                    this.state.selectedFolders.delete(node.id);
+                }
+            });
+
+            item.appendChild(btn);
+            target.appendChild(item);
+
+            // 递归子文件夹
+            if (node.children.length > 0) {
+                this.renderFolderTree(node.children, target, d + 1);
+            }
+        });
+    },
+
+    // ==========================================
+    //  书签内容渲染
+    // ==========================================
+
+    async loadBookmarkFolder(folderId) {
+        try {
+            const children = await chrome.bookmarks.getChildren(folderId);
+            if (this.state.activeTab !== folderId) return;
+            this.renderBookmarkItems(children);
+        } catch (e) {
+            this.error('Failed to load bookmark folder', e);
+            // 文件夹已删除时切换到剩余标签。
+            this.removeBookmarkTab(folderId);
+        }
+    },
+
+    renderBookmarkItems(nodes) {
+        const tab = this.state.bookmarkTabs.find(tab => tab.id === this.state.activeTab);
+        this.grid.render(nodes.filter(node => node.url), tab?.title || '快捷访问');
     },
 
     // ==========================================
@@ -437,16 +397,28 @@ const App = {
 
     bindEvents() {
         const {
-            editSitesBtn, themeToggleBtn, searchForm, searchInput,
+            themeToggleBtn, searchForm, searchInput,
             settingsBtn, settingsDialog, settingsCancelBtn,
             iconsPerRowSlider, iconRadiusSlider, settingsForm,
-            backgroundUploadInput, resetBackgroundBtn,
-            addSiteDialog, cancelBtn, addSiteForm, sitesContainer
+            backgroundUploadInput, resetBackgroundBtn
         } = this.elements;
 
-        // 编辑模式 & 主题切换
-        editSitesBtn.addEventListener('click', () => this.toggleEditMode());
+        // 主题切换
         themeToggleBtn.addEventListener('click', () => this.toggleTheme());
+
+        // 文件夹选择器取消
+        this.elements.folderPickerCancelBtn.addEventListener('click', () => {
+            this.elements.folderPickerDialog.close();
+        });
+        document.getElementById('folder-picker-save-btn').addEventListener('click', async () => {
+            const tabs = Array.from(this.state.selectedFolders.values());
+            await chrome.storage.local.set({ bookmarkTabs: tabs });
+            this.state.bookmarkTabs = tabs;
+            const activeId = tabs.some(tab => tab.id === this.state.activeTab)
+                ? this.state.activeTab : tabs[0]?.id || null;
+            this.switchTab(activeId);
+            this.elements.folderPickerDialog.close();
+        });
 
         // 搜索
         searchForm.addEventListener('submit', (e) => {
@@ -509,41 +481,6 @@ const App = {
             });
         });
 
-        // 添加站点弹窗
-        cancelBtn.addEventListener('click', () => addSiteDialog.close());
-
-        addSiteForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const name = document.getElementById('site-name').value;
-            let url = document.getElementById('site-url').value;
-
-            if (url && !/^https?:\/\//i.test(url)) {
-                url = 'https://' + url;
-            }
-
-            await this.addSite(name, url);
-            addSiteForm.reset();
-            addSiteDialog.close();
-        });
-
-        // 站点点击事件代理
-        sitesContainer.addEventListener('click', (e) => {
-            const target = e.target;
-
-            if (target.id === 'add-site-btn' || target.parentElement?.id === 'add-site-btn') {
-                if (this.state.isEditMode) return;
-                addSiteDialog.showModal();
-            } else if (target.classList.contains('delete-site-btn')) {
-                e.preventDefault();
-                e.stopPropagation();
-                const siteId = parseInt(target.dataset.id, 10);
-                this.deleteSite(siteId);
-            } else if (target.closest('.site-link')) {
-                if (this.state.isEditMode) {
-                    e.preventDefault();
-                }
-            }
-        });
     }
 };
 
