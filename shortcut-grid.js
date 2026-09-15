@@ -68,10 +68,8 @@ const ShortcutIcons = {
 };
 
 class ShortcutGrid {
-    constructor(container, heading, count, onChooseFolders) {
+    constructor(container, onChooseFolders) {
         this.container = container;
-        this.heading = heading;
-        this.count = count;
         this.onChooseFolders = onChooseFolders;
     }
 
@@ -102,8 +100,7 @@ class ShortcutGrid {
 
     render(sites, title) {
         const cards = sites.map(site => this.createCard(site)).filter(Boolean);
-        this.heading.textContent = title;
-        this.count.textContent = `${cards.length} 个网站`;
+        this.container.setAttribute('aria-label', title);
         this.container.removeAttribute('aria-busy');
         this.container.replaceChildren(...cards);
         if (!cards.length) this.renderEmpty('这个文件夹还没有网站', '在浏览器中将网站收藏到此文件夹，即可在这里快速访问。');
@@ -131,14 +128,12 @@ class ShortcutGrid {
     }
 
     showUnselected() {
-        this.heading.textContent = '快捷访问';
-        this.count.textContent = '从一个文件夹开始';
+        this.container.setAttribute('aria-label', '快捷访问');
         this.renderEmpty(undefined, undefined, true);
     }
 
     showLoading(title) {
-        this.heading.textContent = title;
-        this.count.textContent = '正在加载';
+        this.container.setAttribute('aria-label', title);
         this.container.setAttribute('aria-busy', 'true');
         const item = document.createElement('li');
         item.className = 'shortcuts-loading';

@@ -213,26 +213,6 @@ main {
 .shortcuts-section {
     width: 100%;
 }
-.shortcuts-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: end;
-    gap: 16px;
-    padding: 0 12px 22px;
-    text-align: left;
-}
-.shortcuts-heading-group h1 {
-    font-size: 20px;
-    line-height: 1.4;
-    font-weight: 600;
-    letter-spacing: -0.02em;
-}
-.shortcuts-count {
-    color: var(--color-text-secondary);
-    font-size: 11px;
-    white-space: nowrap;
-    padding-bottom: 3px;
-}
 .shortcuts-grid {
     list-style: none;
     display: grid;
@@ -734,12 +714,6 @@ input[type="file"]::file-selector-button:hover {
     main {
         max-height: calc(100dvh - 220px);
         padding: 16px;
-    }
-    .shortcuts-header {
-        padding-inline: 4px;
-    }
-    .shortcuts-heading-group h1 {
-        font-size: 18px;
     }
     .shortcut-card {
         padding-inline: 6px;

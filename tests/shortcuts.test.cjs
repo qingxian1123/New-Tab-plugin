@@ -40,7 +40,7 @@ function setup() {
     const context = vm.createContext({ document, chrome, console, URL, Map });
     vm.runInContext(fs.readFileSync(path.join(root, 'shortcut-grid.js'), 'utf8') + '\nglobalThis.icons = ShortcutIcons; globalThis.Grid = ShortcutGrid;', context);
     vm.runInContext(fs.readFileSync(path.join(root, 'main.js'), 'utf8') + '\nglobalThis.app = App;', context);
-    const grid = new context.Grid(new Element('ul'), new Element('h1'), new Element(), () => {});
+    const grid = new context.Grid(new Element('ul'), () => {});
     context.app.grid = grid;
     return { ...context, grid, writes };
 }
@@ -54,7 +54,7 @@ test('brand matching recognizes subdomains without matching lookalike domains; a
     for (const name of ['globe', 'arrow-up-right', 'bookmark', 'plus', 'folder']) assert.ok(fs.existsSync(path.join(root, 'icon/lucide', name + '.svg')));
 });
 
-test('cards retain full names and destinations, reject executable and malformed URLs, and count visible sites', () => {
+test('cards retain full names and destinations, reject executable and malformed URLs, and render only valid sites', () => {
     const { grid } = setup();
     grid.render([
         { title: '<img onerror=alert(1)>', url: 'https://github.com/path?q=1' },
@@ -64,7 +64,6 @@ test('cards retain full names and destinations, reject executable and malformed 
         { title: 'Local', url: 'file:///C:/notes.html' },
     ], '工作');
     assert.equal(grid.container.children.length, 2);
-    assert.equal(grid.count.textContent, '2 个网站');
     const link = grid.container.children[0].children[0];
     assert.equal(link.href, 'https://github.com/path?q=1');
     assert.equal(link.children[1].textContent, '<img onerror=alert(1)>');
@@ -83,7 +82,6 @@ test('generic icon survives failed favicon loading; empty and unselected states 
     assert.equal(badge.children.length, 1);
     grid.showLoading('工作');
     grid.render([], '工作');
-    assert.equal(grid.count.textContent, '0 个网站');
     assert.equal(grid.container.attributes['aria-busy'], undefined);
     grid.showUnselected();
     assert.equal(grid.container.children[0].children.at(-1).tagName, 'button');
@@ -123,6 +121,6 @@ test('a slow response from the previous folder cannot overwrite the active folde
     await app.loadBookmarkFolder('new');
     resolveOld([{title: 'Old', url: 'https://github.com'}]);
     await oldRequest;
-    assert.equal(grid.heading.textContent, 'New');
+    assert.equal(grid.container.attributes['aria-label'], 'New');
     assert.equal(grid.container.children[0].children[0].href, 'https://figma.com/');
 });

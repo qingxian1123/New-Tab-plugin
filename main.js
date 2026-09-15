@@ -69,7 +69,6 @@ const App = {
         this.applyTheme();
         this.applySettings();
         this.grid = new ShortcutGrid(this.elements.sitesContainer,
-            document.getElementById('shortcuts-heading'), document.getElementById('shortcuts-count'),
             () => this.showFolderPicker());
         this.renderTabBar();
         this.switchTab(this.state.bookmarkTabs[0]?.id || null);
