@@ -11,8 +11,6 @@ const App = {
         settingsCancelBtn: document.getElementById('settings-cancel-btn'),
         iconsPerRowSlider: document.getElementById('icons-per-row'),
         iconsPerRowValue: document.getElementById('icons-per-row-value'),
-        backgroundUploadInput: document.getElementById('background-upload'),
-        resetBackgroundBtn: document.getElementById('reset-background-btn'),
 
         themeToggleBtn: document.getElementById('theme-toggle-btn'),
         iconRadiusSlider: document.getElementById('icon-radius-slider'),
@@ -44,7 +42,6 @@ const App = {
         theme: 'dark',
         settings: {},
 
-        hasCustomBackground: false,
         activeTab: null,
         bookmarkTabs: [],
         selectedFolders: new Map(),
@@ -72,9 +69,11 @@ const App = {
             () => this.showFolderPicker());
         this.renderTabBar();
         this.switchTab(this.state.bookmarkTabs[0]?.id || null);
+        this.wallpaper = new WallpaperController();
+        this.wallpaper.bind();
         this.bindEvents();
         this.startClock();
-        await this.applyBackground();
+        await this.wallpaper.load();
 
         document.documentElement.classList.add('ready');
     },
@@ -209,23 +208,6 @@ const App = {
     },
 
     // ==========================================
-    //  背景壁纸（扁平化：仅自定义壁纸，无默认网络图）
-    // ==========================================
-
-    async applyBackground() {
-        const { customBackground } = await chrome.storage.local.get('customBackground');
-        if (customBackground) {
-            document.documentElement.style.setProperty('--bg-image', customBackground);
-            document.body.classList.add('has-bg');
-            this.state.hasCustomBackground = true;
-        } else {
-            document.documentElement.style.removeProperty('--bg-image');
-            document.body.classList.remove('has-bg');
-            this.state.hasCustomBackground = false;
-        }
-    },
-
-    // ==========================================
     //  设置
     // ==========================================
 
@@ -249,8 +231,8 @@ const App = {
             iconsPerRow: parseInt(iconsPerRowSlider.value, 10),
             iconRadius: parseInt(iconRadiusSlider.value, 10),
         };
-        this.state.settings = newSettings;
         await chrome.storage.sync.set({ settings: newSettings });
+        this.state.settings = newSettings;
         this.applySettings();
     },
 
@@ -398,8 +380,7 @@ const App = {
         const {
             themeToggleBtn, searchForm, searchInput,
             settingsBtn, settingsDialog, settingsCancelBtn,
-            iconsPerRowSlider, iconRadiusSlider, settingsForm,
-            backgroundUploadInput, resetBackgroundBtn
+            iconsPerRowSlider, iconRadiusSlider, settingsForm
         } = this.elements;
 
         // 主题切换
@@ -433,7 +414,17 @@ const App = {
         });
 
         // 设置弹窗
-        settingsBtn.addEventListener('click', () => settingsDialog.showModal());
+        settingsBtn.addEventListener('click', () => {
+            this.wallpaper.begin();
+            settingsDialog.showModal();
+        });
+        settingsDialog.addEventListener('close', () => {
+            this.wallpaper.cancel();
+            this.applySettings();
+        });
+        settingsDialog.addEventListener('cancel', (event) => {
+            if (this.savingSettings) event.preventDefault();
+        });
         settingsCancelBtn.addEventListener('click', () => {
             settingsDialog.close();
             this.applySettings();
@@ -450,34 +441,23 @@ const App = {
         // 保存设置
         settingsForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            await this.saveSettings();
-            settingsDialog.close();
-        });
-
-        // 上传壁纸
-        backgroundUploadInput.addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (!file || !file.type.startsWith('image/')) return;
-
-            const reader = new FileReader();
-            reader.onload = () => {
-                const cssValue = `url('${reader.result}')`;
-                chrome.storage.local.set({ customBackground: cssValue });
-                document.documentElement.style.setProperty('--bg-image', cssValue);
-                document.body.classList.add('has-bg');
-                this.state.hasCustomBackground = true;
-            };
-            reader.readAsDataURL(file);
-        });
-
-        // 重置壁纸
-        resetBackgroundBtn.addEventListener('click', () => {
-            chrome.storage.local.remove('customBackground', () => {
-                document.documentElement.style.removeProperty('--bg-image');
-                document.body.classList.remove('has-bg');
-                this.state.hasCustomBackground = false;
-                backgroundUploadInput.value = '';
-            });
+            if (this.wallpaper.busy || this.savingSettings) return;
+            this.savingSettings = true;
+            settingsForm.inert = true;
+            const button = document.getElementById('settings-save-btn');
+            button.disabled = true;
+            try {
+                await this.saveSettings();
+                await this.wallpaper.save();
+                settingsDialog.close();
+            } catch (error) {
+                this.error('Failed to save settings', error);
+                document.getElementById('settings-error').textContent = '保存失败，可能是存储空间不足。请尝试较小的图片或重试。';
+            } finally {
+                this.savingSettings = false;
+                settingsForm.inert = false;
+                button.disabled = false;
+            }
         });
 
     }

@@ -19,6 +19,10 @@ const folders = [
 const fixture = `
 const folders = ${JSON.stringify(folders)};
 const local = JSON.parse(localStorage.getItem('preview-state') || 'null') || { migrationComplete: true, bookmarkTabs: folders.map(({id,title})=>({id,title})) };
+if (new URLSearchParams(location.search).has('wallpaper')) {
+    const svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900"><defs><linearGradient id="sky" x2="0" y2="1"><stop stop-color="#427b9b"/><stop offset="1" stop-color="#edc59b"/></linearGradient></defs><path fill="url(#sky)" d="M0 0h1600v900H0z"/><circle cx="1150" cy="260" r="110" fill="#ffecd1"/><path fill="#748d85" d="M0 620 430 310 770 610 1130 480 1600 650V900H0z"/><path fill="#294f57" d="M0 760 300 570 690 770 1100 600 1600 740V900H0z"/></svg>';
+    local.customBackground = 'url("data:image/svg+xml;base64,' + btoa(svg) + '")';
+}
 const sync = { theme: localStorage.getItem('theme') || 'dark' };
 const storage = data => ({ get: async () => data, set: async values => { Object.assign(data, values); if (data === local) localStorage.setItem('preview-state', JSON.stringify(local)); }, remove: async (key, callback) => { delete data[key]; callback?.(); } });
 window.chrome = { storage: { local: storage(local), sync: storage(sync) }, bookmarks: { getTree: async () => [{children: folders}], getChildren: async id => folders.find(folder => folder.id === id).children }, search: { query: ({text}) => console.log(text) } };

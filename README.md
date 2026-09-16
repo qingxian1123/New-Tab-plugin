@@ -18,15 +18,23 @@ Reload the extension after changing its files. This version requests the `bookma
 - The grid respects the desktop column setting and switches to four or three columns in smaller windows.
 - Legacy saved shortcuts remain in local storage; no default speed-dial tab is added.
 
-## Development
+## Wallpaper
+
+Open **个性化** to select a JPG, PNG, WebP, or AVIF image up to 6 MB. Existing wallpapers remain compatible. Wallpaper colors are preserved by default in both themes; the optional dim slider ranges from 0% to 60%. Text uses local contrast treatments instead of a full-page opaque overlay.
+
+Uploads, dimming, and removal preview immediately and persist only on Save. Cancel or Escape restores the saved wallpaper. A failed upload or storage write displays an error without replacing the saved image.
+
+## Development workflow
 
 No build step or runtime package installation is needed.
 
 ```sh
-node --test tests/shortcuts.test.cjs
+node --test tests/*.test.cjs
 node tests/preview.cjs
 ```
 
 The preview is available at `http://127.0.0.1:4173`. It injects synthetic bookmark data only through the development server; the extension never loads these fixtures. Browser favicon-cache behavior must be checked in the loaded extension.
 
 `shortcut-grid.js` owns cards, local icon selection, and empty/loading states. `main.js` owns storage, bookmark selection, settings, and page lifecycle.
+
+`wallpaper.js` owns wallpaper drafts, image validation, preview rendering, and persistence. Visit `http://127.0.0.1:4173/?wallpaper` for a synthetic landscape fixture when checking wallpaper contrast.

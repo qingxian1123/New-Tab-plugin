@@ -40,7 +40,25 @@
     <!-- Settings Dialog -->
     <dialog id="settings-dialog">
         <form id="settings-form">
-            <h2>设置</h2>
+            <h2>个性化</h2>
+            <section class="wallpaper-settings" aria-label="壁纸">
+                <div id="wallpaper-preview" class="wallpaper-preview">
+                    <span class="wallpaper-preview-label" id="wallpaper-status">使用主题背景</span>
+                </div>
+                <div class="wallpaper-actions">
+                    <input type="file" id="background-upload" accept="image/jpeg,image/png,image/webp,image/avif" class="wallpaper-upload">
+                    <label for="background-upload" class="wallpaper-upload-label">选择图片</label>
+                    <button type="button" id="reset-background-btn">移除壁纸</button>
+                </div>
+                <p class="setting-hint">JPG、PNG、WebP、AVIF · 最大 6 MB</p>
+                <div class="wallpaper-dim-heading">
+                    <label for="wallpaper-dim">壁纸压暗</label>
+                    <output id="wallpaper-dim-value" for="wallpaper-dim">0%</output>
+                </div>
+                <input type="range" id="wallpaper-dim" min="0" max="60" step="1" value="0">
+                <p class="setting-hint">0% 保留原色，向右调节可让文字更清晰。</p>
+            </section>
+            <hr>
             <div class="setting-item">
                 <label for="icons-per-row">每行图标数：<span id="icons-per-row-value">6</span></label>
                 <input type="range" id="icons-per-row" min="6" max="10">
@@ -49,19 +67,10 @@
                 <label for="icon-radius-slider">图标圆角：<span id="icon-radius-value">20</span>px</label>
                 <input type="range" id="icon-radius-slider" min="0" max="32" value="20">
             </div>
-            <hr>
-            <div class="setting-item">
-                <label for="background-upload">自定义壁纸</label>
-                <div class="file-upload-wrapper">
-                    <input type="file" id="background-upload" accept="image/*">
-                    <button type="button" id="reset-background-btn" class="btn-secondary" title="重置壁纸" aria-label="Reset Background">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
-                    </button>
-                </div>
-            </div>
+            <p id="settings-error" class="settings-error" role="alert"></p>
             <div class="dialog-buttons">
                 <button type="button" id="settings-cancel-btn" class="btn-secondary">取消</button>
-                <button type="submit" class="btn-save">保存</button>
+                <button type="submit" id="settings-save-btn" class="btn-save">保存</button>
             </div>
         </form>
     </dialog>
@@ -78,6 +87,7 @@
     </div>
 
     <script src="shortcut-grid.js"></script>
+    <script src="wallpaper.js"></script>
     <script src="main.js"></script>
 </body>
 </html>
