@@ -10,15 +10,28 @@ const folders = [
         ['哔哩哔哩', 'https://bilibili.com'], ['Spotify', 'https://spotify.com'],
         ['Google', 'https://google.com'], ['知乎', 'https://zhihu.com'],
         ['Dribbble', 'https://dribbble.com'], ['Discord', 'https://discord.com'],
-        ['MDN Web Docs · 开发文档与参考手册', 'https://developer.mozilla.org'],
-        ['我的工作台', 'https://example.com'],
+        ['MDN Web Docs', 'https://developer.mozilla.org'],
+        ['Wikipedia', 'https://wikipedia.org'],
     ].map(([title, url], i) => ({ id: String(i), title, url })) },
-    { id: 'learn', title: '学习', children: [{ id: 'wiki', title: 'Wikipedia', url: 'https://wikipedia.org' }] },
-    { id: 'empty', title: '灵感', children: [] },
+    { id: 'learn', title: '开发', children: [
+        ['GitHub', 'https://github.com'], ['GitLab', 'https://gitlab.com'],
+        ['Stack Overflow', 'https://stackoverflow.com'], ['MDN Web Docs', 'https://developer.mozilla.org'],
+        ['npm', 'https://npmjs.com'], ['Vercel', 'https://vercel.com'],
+    ].map(([title, url], i) => ({ id: `dev-${i}`, title, url })) },
+    { id: 'empty', title: '灵感', children: [
+        ['Figma', 'https://figma.com'], ['Dribbble', 'https://dribbble.com'],
+        ['Pinterest', 'https://pinterest.com'], ['YouTube', 'https://youtube.com'],
+        ['Notion', 'https://notion.so'], ['Spotify', 'https://spotify.com'],
+    ].map(([title, url], i) => ({ id: `inspiration-${i}`, title, url })) },
 ];
 const fixture = `
 const folders = ${JSON.stringify(folders)};
 const local = JSON.parse(localStorage.getItem('preview-state') || 'null') || { migrationComplete: true, bookmarkTabs: folders.map(({id,title})=>({id,title})) };
+if (new URLSearchParams(location.search).has('showcase')) {
+    local.bookmarkTabs = folders.map(({id,title})=>({id,title}));
+    local.customBackground = '';
+    local.wallpaperDim = 0;
+}
 if (new URLSearchParams(location.search).has('wallpaper')) {
     const svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900"><defs><linearGradient id="sky" x2="0" y2="1"><stop stop-color="#427b9b"/><stop offset="1" stop-color="#edc59b"/></linearGradient></defs><path fill="url(#sky)" d="M0 0h1600v900H0z"/><circle cx="1150" cy="260" r="110" fill="#ffecd1"/><path fill="#748d85" d="M0 620 430 310 770 610 1130 480 1600 650V900H0z"/><path fill="#294f57" d="M0 760 300 570 690 770 1100 600 1600 740V900H0z"/></svg>';
     local.customBackground = 'url("data:image/svg+xml;base64,' + btoa(svg) + '")';
